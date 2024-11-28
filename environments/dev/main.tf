@@ -1,3 +1,17 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+
+provider "aws" {
+  region = "ap-south-1"
+}
+
+
 module "ec2" {
   source        = "../../modules/ec2"
   ami_id        = "ami-0dee22c13ea7a9a67"
