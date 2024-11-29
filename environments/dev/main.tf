@@ -18,7 +18,7 @@ module "ec2" {
   source        = "../../modules/ec2"
   ami_id        = "ami-0dee22c13ea7a9a67"
   instance_type = "t2.micro"
-  name          = "dev-instance-6721"
+  name          = "dev-instance-7137"
   environment   = "dev"
 }
 
