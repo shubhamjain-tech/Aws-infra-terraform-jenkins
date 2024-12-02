@@ -1,3 +1,3 @@
-output "bucket_arn" {
-  value = aws_s3_bucket.example.arn
+output "bucket_names" {
+  value = aws_s3_bucket.example.*.bucket
 }
