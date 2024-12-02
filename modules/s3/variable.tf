@@ -1,6 +1,6 @@
 variable "buckets" {
   description = "List of S3 bucket configurations"
-  type        = map(object({
+  type        = list(object({
     bucket_name = string
   }))
 }

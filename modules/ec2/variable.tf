@@ -1,6 +1,6 @@
 variable "instances" {
   description = "List of instance configurations"
-  type        = map(object({
+  type        = list(object({
     ami_id        = string
     instance_type = string
     name          = string
