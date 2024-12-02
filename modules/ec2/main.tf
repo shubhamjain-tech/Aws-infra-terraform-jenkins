@@ -1,5 +1,5 @@
 resource "aws_instance" "example" {
-  for_each = toset(var.instances)
+  for_each = var.instances
   ami           = each.value.ami_id
   instance_type = each.value.instance_type
   tags = {
@@ -7,3 +7,5 @@ resource "aws_instance" "example" {
     Environment = var.environment
   }
 }
+
+

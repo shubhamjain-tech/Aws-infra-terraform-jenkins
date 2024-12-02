@@ -1,7 +1,9 @@
+
+
 output "instance_ids" {
-  value = aws_instance.example.*.id
+  value = [for instance in aws_instance.example : instance.id]
 }
 
 output "public_ips" {
-  value = aws_instance.example.*.public_ip
+  value = [for instance in aws_instance.example : instance.public_ip]
 }
