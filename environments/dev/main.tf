@@ -28,7 +28,7 @@ module "ec2" {
 
 module "s3" {
   source      = "../../modules/s3"
-  buckets     = [
+  bucket_names     = [
     { bucket_name = "dev-demo-buck-6721" },
     { bucket_name = "dev-demo-buck-1241" },
     { bucket_name = "dev-demo-buck-9021" },
