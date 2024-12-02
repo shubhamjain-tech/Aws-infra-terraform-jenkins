@@ -1,3 +1,4 @@
+
 output "bucket_names" {
-  value = aws_s3_bucket.example.*.bucket
+  value = [for bucket in aws_s3_bucket.example : bucket.bucket]
 }
