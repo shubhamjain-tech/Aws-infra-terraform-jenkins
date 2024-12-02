@@ -24,7 +24,7 @@ module "ec2" {
     },
     instance2 = {
       ami_id        = "ami-0dee22c13ea7a9a67"
-      instance_type = "t2.medium"
+      instance_type = "t2.micro"
       name          = "dev-instance-2"
     }
     # Add more instances as needed
