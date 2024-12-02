@@ -28,11 +28,12 @@ module "ec2" {
 
 module "s3" {
   source      = "../../modules/s3"
-  bucket_names     = [
-    { bucket_name = "dev-demo-buck-6721" },
-    { bucket_name = "dev-demo-buck-1241" },
-    { bucket_name = "dev-demo-buck-9021" },
-    { bucket_name = "dev-demo-buck-294" }
-  ]
+  bucket_names = {
+    "bucket1" = { bucket_name = "dev-demo-buck-6721" },
+    "bucket2" = { bucket_name = "dev-demo-buck-1241" },
+    "bucket3" = { bucket_name = "dev-demo-buck-9021" },
+    "bucket4" = { bucket_name = "dev-demo-buck-294" }
+  }
   environment = "dev"
 }
+
