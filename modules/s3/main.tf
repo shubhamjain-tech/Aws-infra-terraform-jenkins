@@ -1,5 +1,8 @@
 resource "aws_s3_bucket" "example" {
-  for_each = var.buckets
+  for_each = zipmap(
+    range(length(var.buckets)),
+    var.buckets
+  )
 
   bucket = each.value.bucket_name
   tags = {
