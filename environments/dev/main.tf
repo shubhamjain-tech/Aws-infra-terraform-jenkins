@@ -28,11 +28,11 @@ module "ec2" {
       name          = "dev-instance-2"
     },
     # Add more instances as needed
-    instance3 = {
-      ami_id        = "ami-0dee22c13ea7a9a67"
-      instance_type = "t2.micro"
-      name          = "dev-instance-3"
-    }
+    # instance3 = {
+    #   ami_id        = "ami-0dee22c13ea7a9a67"
+    #   instance_type = "t2.micro"
+    #   name          = "dev-instance-3"
+    # }
   }
   environment = "dev"
 }
@@ -50,11 +50,11 @@ module "s3" {
   environment = "dev"
 }
 
-module "vpc" {
-  source          = "../../modules/vpc"
-  environment     = "dev"
-  cidr_block      = "10.0.0.0/16"
-  public_subnet_cidr = "10.0.1.0/24"
-  private_subnet_cidr = "10.0.2.0/24"
-  availability_zone   = "ap-south-1"
-}
+# module "vpc" {
+#   source          = "../../modules/vpc"
+#   environment     = "dev"
+#   cidr_block      = "10.0.0.0/16"
+#   public_subnet_cidr = "10.0.1.0/24"
+#   private_subnet_cidr = "10.0.2.0/24"
+#   availability_zone   = "ap-south-1"
+# }
