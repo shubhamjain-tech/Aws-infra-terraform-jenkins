@@ -25,3 +25,8 @@ variable "availability_zones" {
   description = "List of availability zones"
   type        = list(string)
 }
+
+variable "environment" {
+  description = "dev"
+  type        = string
+}
