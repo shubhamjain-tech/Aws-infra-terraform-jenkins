@@ -32,6 +32,11 @@ module "ec2" {
       ami_id        = "ami-0dee22c13ea7a9a67"
       instance_type = "t2.micro"
       name          = "dev-instance-4"
+    },
+    instance5 = {
+      ami_id        = "ami-0dee22c13ea7a9a67"
+      instance_type = "t2.micro"
+      name          = "dev-instance-5"
     }
   }
   environment = "dev"
