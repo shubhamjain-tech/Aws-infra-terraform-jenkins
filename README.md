@@ -205,7 +205,7 @@ pipeline {
 }
 ```
 
-# Prod CI/CD Pipeline: whenever u merge code feature-prod with prod your pipline will be triggred. 
+Prod CI/CD Pipeline: whenever u merge code feature-prod with prod your pipline will be triggred. 
 ```bash
 pipeline {
     agent any
@@ -257,7 +257,7 @@ pipeline {
 }
 ```
 
-# Destroy pipeline for dev environment
+Destroy pipeline for dev environment
 ```bash
 pipeline {
     agent any
@@ -307,7 +307,7 @@ pipeline {
     }
 }
 ```
-# Destroy pipeline for Prod-environment
+Destroy pipeline for Prod-environment
 ```bash
 pipeline {
     agent any
