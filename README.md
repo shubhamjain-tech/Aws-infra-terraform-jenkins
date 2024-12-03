@@ -205,7 +205,7 @@ pipeline {
 }
 ```
 
-Prod CI/CD Pipeline: whenever u merge code feature-prod with prod your pipline will be triggred. 
+Prod CI/CD Pipeline: whenever u merge code feature-prod branch with prod branch your pipline will be triggred. 
 ```bash
 pipeline {
     agent any
