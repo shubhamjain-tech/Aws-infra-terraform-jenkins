@@ -1,104 +1,109 @@
-# resource "aws_vpc" "dev_vpc" {
-#   cidr_block = var.cidr_block
-#   enable_dns_support = true
-#   enable_dns_hostnames = true
-#   tags = {
-#     Name        = "dev-vpc"
-#     Environment = var.environment
-#   }
-# }
+# Create a VPC
+resource "aws_vpc" "main" {
+  cidr_block           = var.vpc_cidr
+  enable_dns_support   = true
+  enable_dns_hostnames = true
+  tags = {
+    Name = var.vpc_name
+    Environment = var.environment
+  }
+}
 
-# # Public Subnet
-# resource "aws_subnet" "dev_subnet_public" {
-#   vpc_id                  = aws_vpc.dev_vpc.id
-#   cidr_block              = var.public_subnet_cidr
-#   availability_zone       = var.availability_zone
-#   map_public_ip_on_launch = true
-#   tags = {
-#     Name        = "dev-public-subnet"
-#     Environment = var.environment
-#   }
-# }
+# Create public subnets
+resource "aws_subnet" "public" {
+  count                   = length(var.public_subnet_cidrs)
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = var.public_subnet_cidrs[count.index]
+  map_public_ip_on_launch = true
+  availability_zone       = element(var.availability_zones, count.index)
+  tags = {
+    Name = "${var.vpc_name}-public-${count.index + 1}"
+    Environment = var.environment
+  }
+}
 
-# # Private Subnet
-# resource "aws_subnet" "dev_subnet_private" {
-#   vpc_id                  = aws_vpc.dev_vpc.id
-#   cidr_block              = var.private_subnet_cidr
-#   availability_zone       = var.availability_zone
-#   tags = {
-#     Name        = "dev-private-subnet"
-#     Environment = var.environment
-#   }
-# }
+# Create private subnets
+resource "aws_subnet" "private" {
+  count             = length(var.private_subnet_cidrs)
+  vpc_id            = aws_vpc.main.id
+  cidr_block        = var.private_subnet_cidrs[count.index]
+  availability_zone = element(var.availability_zones, count.index)
+  tags = {
+    Name = "${var.vpc_name}-private-${count.index + 1}"
+    Environment = var.environment
+  }
+}
 
-# # Internet Gateway
-# resource "aws_internet_gateway" "dev_igw" {
-#   vpc_id = aws_vpc.dev_vpc.id
-#   tags = {
-#     Name        = "dev-igw"
-#     Environment = var.environment
-#   }
-# }
+# Internet Gateway
+resource "aws_internet_gateway" "igw" {
+  vpc_id = aws_vpc.main.id
+  tags = {
+    Name = "${var.vpc_name}-igw"
+    Environment = var.environment
+  }
+}
 
-# # Route Table for Public Subnet
-# resource "aws_route_table" "dev_public_route_table" {
-#   vpc_id = aws_vpc.dev_vpc.id
-#   tags = {
-#     Name        = "dev-public-route-table"
-#     Environment = var.environment
-#   }
-# }
+# Public Route Table
+resource "aws_route_table" "public" {
+  vpc_id = aws_vpc.main.id
+  tags = {
+    Name = "${var.vpc_name}-public-rt"
+    Environment = var.environment
+  }
+}
 
-# # Public Route: Route traffic to internet through the internet gateway
-# resource "aws_route" "dev_public_route" {
-#   route_table_id         = aws_route_table.dev_public_route_table.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   gateway_id             = aws_internet_gateway.dev_igw.id
-# }
+# Associate public subnets with the public route table
+resource "aws_route_table_association" "public" {
+  count          = length(var.public_subnet_cidrs)
+  subnet_id      = aws_subnet.public[count.index].id
+  route_table_id = aws_route_table.public.id
+  
+}
 
-# # Associate Public Subnet with Public Route Table
-# resource "aws_route_table_association" "dev_public_subnet_association" {
-#   subnet_id      = aws_subnet.dev_subnet_public.id
-#   route_table_id = aws_route_table.dev_public_route_table.id
-# }
+# Default Route to Internet Gateway for Public Subnets
+resource "aws_route" "default_public" {
+  route_table_id         = aws_route_table.public.id
+  destination_cidr_block = "0.0.0.0/0"
+  gateway_id             = aws_internet_gateway.igw.id
+}
 
-# # NAT Gateway
-# resource "aws_nat_gateway" "dev_nat_gateway" {
-#   allocation_id = aws_eip.dev_nat_eip.id
-#   subnet_id     = aws_subnet.dev_subnet_public.id
-#   tags = {
-#     Name        = "dev-nat-gateway"
-#     Environment = var.environment
-#   }
-# }
+# Elastic IP for NAT Gateway
+resource "aws_eip" "nat" {
+  vpc = true
+  
+}
 
-# # Elastic IP for NAT Gateway
-# resource "aws_eip" "dev_nat_eip" {
-#   vpc = true
-#   tags = {
-#     Name        = "dev-nat-eip"
-#     Environment = var.environment
-#   }
-# }
+# Create NAT Gateway in the first public subnet
+resource "aws_nat_gateway" "main" {
+  allocation_id = aws_eip.nat.id
+  subnet_id     = aws_subnet.public[0].id  # Place the NAT gateway in the first public subnet
+  tags = {
+    Name = "${var.vpc_name}-nat-gateway"
+    Environment = var.environment
+  }
+}
 
-# # Route Table for Private Subnet
-# resource "aws_route_table" "dev_private_route_table" {
-#   vpc_id = aws_vpc.dev_vpc.id
-#   tags = {
-#     Name        = "dev-private-route-table"
-#     Environment = var.environment
-#   }
-# }
+# Private Route Table
+resource "aws_route_table" "private" {
+  vpc_id = aws_vpc.main.id
+  tags = {
+    Name = "${var.vpc_name}-private-rt"
+    Environment = var.environment
+  }
+}
 
-# # Private Route: Route traffic to the internet via NAT Gateway
-# resource "aws_route" "dev_private_route" {
-#   route_table_id         = aws_route_table.dev_private_route_table.id
-#   destination_cidr_block = "0.0.0.0/0"
-#   nat_gateway_id         = aws_nat_gateway.dev_nat_gateway.id
-# }
+# Default Route to NAT Gateway for Private Subnets
+resource "aws_route" "default_private" {
+  route_table_id         = aws_route_table.private.id
+  destination_cidr_block = "0.0.0.0/0"
+  nat_gateway_id         = aws_nat_gateway.main.id
+  
+}
 
-# # Associate Private Subnet with Private Route Table
-# resource "aws_route_table_association" "dev_private_subnet_association" {
-#   subnet_id      = aws_subnet.dev_subnet_private.id
-#   route_table_id = aws_route_table.dev_private_route_table.id
-# }
+# Associate private subnets with the private route table
+resource "aws_route_table_association" "private" {
+  count          = length(var.private_subnet_cidrs)
+  subnet_id      = aws_subnet.private[count.index].id
+  route_table_id = aws_route_table.private.id
+  
+}
