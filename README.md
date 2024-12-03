@@ -50,6 +50,7 @@ This section outlines the steps to set up Jenkins and configure CI/CD pipelines 
 
 1. Setting up the Jenkins Server
 Launch an EC2 Instance:
+
 Instance Name: Jenkins Server.
 
 Instance Type: t2.medium.
@@ -146,12 +147,13 @@ Select Push Events.
 
 Create Jenkins Pipelines:
 
-# Create two pipelines (dev and prod) from the Jenkins dashboard.
+# Create two pipelines (dev and prod) from the Jenkins dashboard. 
 
 Use the respective pipeline scripts provided below.
+
 CI/CD Pipeline Scripts
 
-Dev CI/CD Pipeline
+Dev CI/CD Pipeline: Whenever u merge code dev-feature branch with dev branch your pipline will be triggred 
 ```bash
 pipeline {
     agent any
@@ -203,7 +205,7 @@ pipeline {
 }
 ```
 
-# Prod CI/CD Pipeline
+# Prod CI/CD Pipeline: whenever u merge code feature-prod with prod your pipline will be triggred. 
 ```bash
 pipeline {
     agent any
@@ -254,6 +256,109 @@ pipeline {
     }
 }
 ```
+
+# Destroy pipeline for dev environment
+```bash
+pipeline {
+    agent any
+    environment {
+        AWS_DEFAULT_REGION = 'ap-south-1'
+    }
+    options {
+        // Makes credentials globally available in the pipeline
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']])
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'dev', url: 'https://github.com/shubhamjain-tech/Aws-infra-terraform-jenkins.git'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh '''
+                cd environments/dev
+                terraform init -backend-config="bucket=mybucket-backend-6721" \
+                               -backend-config="key=dev/terraform.tfstate" \
+                               -backend-config="region=ap-south-1" \
+                               -backend-config="encrypt=true"
+                '''
+            }
+        }
+
+        stage('Terraform Destroy') {
+            steps {
+                sh '''
+                cd environments/dev
+                terraform destroy -auto-approve
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Terraform resources destroyed successfully!'
+        }
+        failure {
+            echo 'Terraform destroy failed. Check the logs.'
+        }
+    }
+}
+```
+# Destroy pipeline for Prod-environment
+```bash
+pipeline {
+    agent any
+    environment {
+        AWS_DEFAULT_REGION = 'ap-south-1'
+    }
+    options {
+        // Makes credentials globally available in the pipeline
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']])
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'prod', url: 'https://github.com/shubhamjain-tech/Aws-infra-terraform-jenkins.git'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh '''
+                cd environments/prod
+                terraform init -backend-config="bucket=mybucket-backend-6721" \
+                               -backend-config="key=prod/terraform.tfstate" \
+                               -backend-config="region=ap-south-1" \
+                               -backend-config="encrypt=true"
+                '''
+            }
+        }
+
+        stage('Terraform Destroy') {
+            steps {
+                sh '''
+                cd environments/prod
+                terraform destroy -auto-approve
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Terraform resources destroyed successfully Pod ENV!'
+        }
+        failure {
+            echo 'Terraform destroy failed. Check the logs.'
+        }
+    }
+}
+```
+
+
 
 
 # GIT Commands 
