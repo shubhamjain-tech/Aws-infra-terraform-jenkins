@@ -11,6 +11,6 @@ variable "instances" {
 
 
 variable "environment" {
-  description = "dev"
+  description = "environment for dev or prod"
   type        = string
 }
