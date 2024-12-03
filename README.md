@@ -1,16 +1,20 @@
 # GIT Commands 
 For creating new branch - 
-'''bash
-git checkout -b <branch-name> (locally) 
+```bash
+git checkout -b <branch-name> (locally)
+```
 
 For push created branch - 
-'''bash
+```bash
 git push -u origin <branch-name> (remote)
+```
 
 For delete branch in locally 
-'''bash
+```bash
 git branch -d <branch-name>
+```
 
 For delete branch in remote
-'''bash
+```bash
 git push origin --delete <branch-name>
+```
