@@ -44,6 +44,216 @@ Deploy: Executes terraform apply to provision or update resources.
 ![image](https://github.com/user-attachments/assets/84d01125-bbe0-4569-93fe-a4627fbc94bd)
 
 
+# Jenkins Setup and CI/CD Pipeline Implementation
+
+This section outlines the steps to set up Jenkins and configure CI/CD pipelines for automating AWS infrastructure provisioning using Terraform.
+
+1. Setting up the Jenkins Server
+Launch an EC2 Instance:
+Instance Name: Jenkins Server.
+
+Instance Type: t2.medium.
+
+Storage: 20 GB.
+
+AMI: Use a Linux-based AMI (e.g., Ubuntu or Amazon Linux).
+
+Attach a security group allowing inbound traffic on port 8080 for Jenkins.
+
+# Connect to the EC2 Instance:
+Use SSH to connect to the server
+```bash
+ssh -i <key-pair>.pem ubuntu@<public-ip-address>
+```
+
+# Install Jenkins:
+
+Update the system and install dependencies
+```bash
+sudo apt update && sudo apt upgrade -y
+sudo apt install openjdk-11-jdk -y
+```
+
+Add Jenkins repository and install Jenkins:
+```bash
+wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
+sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo apt update
+sudo apt install jenkins -y
+```
+
+Start Jenkins:
+```bash
+sudo systemctl start jenkins
+sudo systemctl enable jenkins
+```
+
+# Access Jenkins:
+Open Jenkins in a browser using the instance's public IP and port 8080
+```bash
+http://<instance public-ip>:8080
+```
+
+Retrieve the initial admin password
+```bash
+sudo cat /var/lib/jenkins/secrets/initialAdminPassword
+```
+Complete the setup wizard and install recommended plugins. when your jenkins server is start install AWS crendential plugin
+
+# Installing Required Tools On Instance manually 
+```bash
+sudo apt update
+sudo apt install -y unzip
+wget https://releases.hashicorp.com/terraform/1.5.6/terraform_1.5.6_linux_amd64.zip
+unzip terraform_1.5.6_linux_amd64.zip
+sudo mv terraform /usr/local/bin/
+terraform --version
+```
+
+Install AWS CLI:
+```bash
+sudo apt install awscli -y
+aws --version
+```
+
+Configure AWS CLI:
+```bash
+aws configure
+```
+Enter your AWS credentials, default region, and output format.
+
+# Configuring Jenkins Pipelines
+Set AWS Credentials in Jenkins:
+
+Go to Jenkins Dashboard > Manage Jenkins > Manage Credentials.
+
+Add AWS credentials globally with:
+
+ID: aws-creds.
+
+Access Key and Secret Key.
+
+Set Up GitHub Webhook:
+
+# Navigate to your GitHub repository settings.
+Add a webhook:
+
+Payload URL: http://<jenkins-public-ip>:8080/github-webhook/.
+
+Content Type: application/json.
+
+Select Push Events.
+
+Create Jenkins Pipelines:
+
+# Create two pipelines (dev and prod) from the Jenkins dashboard.
+
+Use the respective pipeline scripts provided below.
+CI/CD Pipeline Scripts
+
+Dev CI/CD Pipeline
+```bash
+pipeline {
+    agent any
+    environment {
+        AWS_DEFAULT_REGION = 'ap-south-1'
+    }
+    options {
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']])
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'dev', url: 'https://github.com/shubhamjain-tech/Aws-infra-terraform-jenkins.git'
+            }
+        }
+        stage('Terraform Init') {
+            steps {
+                sh '''
+                cd environments/dev
+                terraform init
+                '''
+            }
+        }
+        stage('Terraform Plan') {
+            steps {
+                sh '''
+                cd environments/dev
+                terraform plan -out=tfplan
+                '''
+            }
+        }
+        stage('Terraform Apply') {
+            steps {
+                sh '''
+                cd environments/dev
+                terraform apply -auto-approve tfplan
+                '''
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Terraform resources created successfully!'
+        }
+        failure {
+            echo 'Terraform execution failed. Check the logs.'
+        }
+    }
+}
+```
+
+# Prod CI/CD Pipeline
+```bash
+pipeline {
+    agent any
+    environment {
+        AWS_DEFAULT_REGION = 'ap-south-1'
+    }
+    options {
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']])
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+               git branch: 'prod', url: 'https://github.com/shubhamjain-tech/Aws-infra-terraform-jenkins.git'
+            }
+        }
+        stage('Terraform Init') {
+            steps {
+                sh '''
+                cd environments/prod
+                terraform init
+                '''
+            }
+        }
+        stage('Terraform Plan') {
+            steps {
+                sh '''
+                cd environments/prod
+                terraform plan -out=tfplan
+                '''
+            }
+        }
+        stage('Terraform Apply') {
+            steps {
+                sh '''
+                cd environments/prod
+                terraform apply -auto-approve tfplan
+                '''
+            }
+        }
+    }
+    post {
+        success {
+            echo 'Terraform resources created successfully for Prod ENV!'
+        }
+        failure {
+            echo 'Terraform execution failed. Check the logs.'
+        }
+    }
+}
+```
 
 
 # GIT Commands 
