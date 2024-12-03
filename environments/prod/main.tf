@@ -24,13 +24,7 @@ module "ec2" {
     instance_type = "t2.medium", 
     name          = "prod-instance-4", 
     subnet_id     = module.vpc.private_subnet_ids[1]
-  },
-  "prod-instance-5" = {
-    ami_id        = "ami-0dee22c13ea7a9a67", 
-    instance_type = "t2.micro", 
-    name          = "prod-instance-5", 
-    subnet_id     = module.vpc.private_subnet_ids[0]
-  },
+  }
 }
   environment = "prod"
 }
