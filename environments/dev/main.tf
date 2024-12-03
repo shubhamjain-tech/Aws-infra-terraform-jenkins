@@ -15,30 +15,33 @@ provider "aws" {
 
 
 module "ec2" {
-  source   = "../../modules/ec2"
-  instances = {
-    instance1 = {
-      ami_id        = "ami-0dee22c13ea7a9a67"
-      instance_type = "t2.micro"
-      name          = "dev-instance-1"
+  source      = "../../modules/ec2"
+  instances   = [
+    { 
+      ami_id = "ami-0dee22c13ea7a9a67", 
+      instance_type = "t2.micro", 
+      name = "dev-instance-1", 
+      subnet_id = module.vpc.public_subnet_ids[0] 
     },
-    instance2 = {
-      ami_id        = "ami-0dee22c13ea7a9a67"
-      instance_type = "t2.micro"
-      name          = "dev-instance-2"
+    { 
+      ami_id = "ami-0dee22c13ea7a9a67", 
+      instance_type = "t2.medium", 
+      name = "dev-instance-2", 
+      subnet_id = module.vpc.public_subnet_ids[1] 
     },
-    # Add more instances as needed
-    instance4 = {
-      ami_id        = "ami-0dee22c13ea7a9a67"
-      instance_type = "t2.micro"
-      name          = "dev-instance-4"
+    { 
+      ami_id = "ami-0dee22c13ea7a9a67", 
+      instance_type = "t2.micro", 
+      name = "dev-instance-3", 
+      subnet_id = module.vpc.private_subnet_ids[0] 
     },
-    instance5 = {
-      ami_id        = "ami-0dee22c13ea7a9a67"
-      instance_type = "t2.micro"
-      name          = "dev-instance-5"
+    { 
+      ami_id = "ami-0dee22c13ea7a9a67", 
+      instance_type = "t2.medium", 
+      name = "dev-instance-4", 
+      subnet_id = module.vpc.private_subnet_ids[1] 
     }
-  }
+  ]
   environment = "dev"
 }
 

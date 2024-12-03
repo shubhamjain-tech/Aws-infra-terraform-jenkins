@@ -5,11 +5,12 @@ variable "instances" {
     ami_id        = string
     instance_type = string
     name          = string
+    subnet_id     = string
   }))
 }
 
 
 variable "environment" {
-  description = "Environment name (e.g., dev, prod)"
+  description = "dev"
   type        = string
 }
