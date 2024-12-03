@@ -1,6 +1,6 @@
 output "all_instance_ids" {
   description = "List of all instance IDs"
-  value       = aws_instance.example.*.id
+  value       = [for instance in aws_instance.example : instance.id]
 }
 
 output "all_public_ips" {
@@ -10,7 +10,7 @@ output "all_public_ips" {
 
 output "private_ips" {
   description = "List of private IPs for instances in private subnets"
-  value       = aws_instance.example.*.private_ip
+  value       = [for instance in aws_instance.example : instance.private_ip]
 }
 
 output "public_instance_ids" {
