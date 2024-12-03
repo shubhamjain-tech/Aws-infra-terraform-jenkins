@@ -27,6 +27,6 @@ variable "availability_zones" {
 }
 
 variable "environment" {
-  description = "dev"
+  description = "environment for dev or prod"
   type        = string
 }

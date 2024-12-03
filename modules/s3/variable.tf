@@ -5,4 +5,7 @@ variable "bucket_names" {
   }))
 }
 
-variable "environment" {}
+variable "environment" {
+  description = "environment for dev or prod"
+  type        = string
+}
