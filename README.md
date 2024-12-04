@@ -53,6 +53,7 @@ This section outlines the steps to set up Jenkins and configure CI/CD pipelines 
 
 # Setting up the Jenkins Server
 Launch an EC2 Instance:
+
 Instance Name: Jenkins Server.
 
 Instance Type: t2.medium.
@@ -268,6 +269,110 @@ Push code to the dev or prod branch in the GitHub repository.
 The respective Jenkins pipeline will be triggered automatically via the webhook.
 
 Monitor the Jenkins console for pipeline execution logs.
+
+# Destory Pipeline for dev-env
+
+```bash
+pipeline {
+    agent any
+    environment {
+        AWS_DEFAULT_REGION = 'ap-south-1'
+    }
+    options {
+        // Makes credentials globally available in the pipeline
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']])
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'dev', url: 'https://github.com/shubhamjain-tech/Aws-infra-terraform-jenkins.git'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh '''
+                cd environments/dev
+                terraform init -backend-config="bucket=mybucket-backend-6721" \
+                               -backend-config="key=dev/terraform.tfstate" \
+                               -backend-config="region=ap-south-1" \
+                               -backend-config="encrypt=true"
+                '''
+            }
+        }
+
+        stage('Terraform Destroy') {
+            steps {
+                sh '''
+                cd environments/dev
+                terraform destroy -auto-approve
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Terraform resources destroyed successfully!'
+        }
+        failure {
+            echo 'Terraform destroy failed. Check the logs.'
+        }
+    }
+}
+```
+
+# Destory pipeline for prod-branch
+```bash
+pipeline {
+    agent any
+    environment {
+        AWS_DEFAULT_REGION = 'ap-south-1'
+    }
+    options {
+        // Makes credentials globally available in the pipeline
+        withCredentials([[$class: 'AmazonWebServicesCredentialsBinding', credentialsId: 'aws-creds']])
+    }
+    stages {
+        stage('Checkout Code') {
+            steps {
+                git branch: 'prod', url: 'https://github.com/shubhamjain-tech/Aws-infra-terraform-jenkins.git'
+            }
+        }
+
+        stage('Terraform Init') {
+            steps {
+                sh '''
+                cd environments/prod
+                terraform init -backend-config="bucket=mybucket-backend-6721" \
+                               -backend-config="key=prod/terraform.tfstate" \
+                               -backend-config="region=ap-south-1" \
+                               -backend-config="encrypt=true"
+                '''
+            }
+        }
+
+        stage('Terraform Destroy') {
+            steps {
+                sh '''
+                cd environments/prod
+                terraform destroy -auto-approve
+                '''
+            }
+        }
+    }
+
+    post {
+        success {
+            echo 'Terraform resources destroyed successfully Pod ENV!'
+        }
+        failure {
+            echo 'Terraform destroy failed. Check the logs.'
+        }
+    }
+}
+
+```
 
 
 
