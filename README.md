@@ -143,11 +143,11 @@ ID: aws-creds.
 
 Access Key and Secret Key.
 
-Set Up GitHub Webhook:
+# Set Up GitHub Webhook:
 
 Navigate to your GitHub repository settings.
 
-# Add a webhook:
+Add a webhook:
 
 Payload URL: http://<jenkins-public-ip>:8080/github-webhook/.
 
