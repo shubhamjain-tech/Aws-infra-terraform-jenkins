@@ -161,7 +161,8 @@ Create two pipelines (dev and prod) from the Jenkins dashboard.
 Use the respective pipeline scripts provided below.
 
 CI/CD Pipeline Scripts: this script automatically trrigred when you merge code dev-feature to dev branch
-Dev CI/CD Pipeline
+
+# Dev CI/CD Pipeline
 ```bash
 pipeline {
     agent any
@@ -324,7 +325,7 @@ pipeline {
 }
 ```
 
-# Destory pipeline for prod-branch
+# Destory pipeline for prod-env
 ```bash
 pipeline {
     agent any
