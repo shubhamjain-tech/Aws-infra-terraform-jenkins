@@ -77,17 +77,21 @@ ssh -i <key-pair>.pem ubuntu@<public-ip-address>
 Install Jenkins:
 Update the system and install dependencies:
 ```bash
-sudo apt update && sudo apt upgrade -y
-sudo apt install openjdk-11-jdk -y
+sudo apt update
+sudo apt install fontconfig openjdk-21-jre
+java -version
 ```
 
 Add Jenkins repository and install Jenkins:
 ```bash
 Copy code
-wget -q -O - https://pkg.jenkins.io/debian/jenkins.io.key | sudo apt-key add -
-sudo sh -c 'echo deb http://pkg.jenkins.io/debian-stable binary/ > /etc/apt/sources.list.d/jenkins.list'
+sudo wget -O /etc/apt/keyrings/jenkins-keyring.asc \
+  https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
+echo "deb [signed-by=/etc/apt/keyrings/jenkins-keyring.asc]" \
+  https://pkg.jenkins.io/debian-stable binary/ | sudo tee \
+  /etc/apt/sources.list.d/jenkins.list > /dev/null
 sudo apt update
-sudo apt install jenkins -y
+sudo apt install jenkins
 ```
 
 Start Jenkins:
