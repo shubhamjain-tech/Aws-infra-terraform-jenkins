@@ -127,7 +127,9 @@ terraform --version
 
 Install AWS CLI:
 ```bash
-sudo apt install awscli -y
+curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+unzip awscliv2.zip
+sudo ./aws/install
 aws --version
 ```
 
@@ -139,6 +141,7 @@ Enter your AWS credentials, default region, and output format.
 
 # Configuring Jenkins Pipelines
 Set AWS Credentials in Jenkins:
+Install Aws credentilas plugin in jenkins, AFter this follow below step
 Go to Jenkins Dashboard > Manage Jenkins > Manage Credentials.
 
 Add AWS credentials globally with:
